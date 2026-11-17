@@ -71,6 +71,10 @@ final class scanner {
               JOIN {course} c ON c.id = r.courseid
              WHERE r.enabled = 1 AND c.id <> :siteid
           ORDER BY r.courseid", ['siteid' => SITEID]);
+        $hook = new \local_remindstudio\hook\scan_courses();
+        \core\di::get(\core\hook\manager::class)->dispatch($hook);
+        $courseids = array_values(array_diff(array_unique(array_merge($courseids, $hook->get_courseids())), [SITEID]));
+        sort($courseids);
         $cursor = (int) get_config('local_remindstudio', 'scancursor');
         $after = array_filter($courseids, fn($id) => $id > $cursor);
         $started = time();

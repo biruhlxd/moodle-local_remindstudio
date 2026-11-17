@@ -58,13 +58,20 @@ final class rule {
     public readonly array $conditions;
     /** @var array Exit conditions: accessed, coursecompleted, cmid. */
     public readonly array $exits;
+    /** @var bool A site rule (stored with course 0) that another plugin applies to courses. */
+    public readonly bool $template;
+    /** @var stdClass The record the rule was made from. */
+    private readonly stdClass $record;
 
     /**
      * Constructor.
      *
      * @param stdClass $record From local_remindstudio_rule.
+     * @param bool $template A site rule applied to the course in $record->courseid.
      */
-    private function __construct(stdClass $record) {
+    private function __construct(stdClass $record, bool $template = false) {
+        $this->record = $record;
+        $this->template = $template || !$record->courseid;
         $this->id = (int) $record->id;
         $this->courseid = (int) $record->courseid;
         $this->name = $record->name;
@@ -253,7 +260,40 @@ final class rule {
     public static function get_enabled_for_course(int $courseid): array {
         global $DB;
         $records = $DB->get_records('local_remindstudio_rule', ['courseid' => $courseid, 'enabled' => 1], 'priority DESC, id ASC');
-        return array_map(fn(stdClass $record) => new self($record), array_values($records));
+        $rules = array_map(fn(stdClass $record) => new self($record), array_values($records));
+        foreach (self::get_inherited($courseid)->get_rules() as $inherited) {
+            if ($inherited->rule->enabled && $inherited->active) {
+                $rules[] = $inherited->rule;
+            }
+        }
+        usort($rules, fn(self $a, self $b) => [$b->priority, $a->id] <=> [$a->priority, $b->id]);
+        return $rules;
+    }
+
+    /**
+     * The site rules other plugins apply to a course.
+     *
+     * @param int $courseid
+     * @return hook\course_rules
+     */
+    public static function get_inherited(int $courseid): hook\course_rules {
+        $hook = new hook\course_rules($courseid);
+        if ($courseid) {
+            \core\di::get(\core\hook\manager::class)->dispatch($hook);
+        }
+        return $hook;
+    }
+
+    /**
+     * The same rule applied to a course: for site rules.
+     *
+     * @param int $courseid
+     * @return self
+     */
+    public function with_course(int $courseid): self {
+        $record = clone $this->record;
+        $record->courseid = $courseid;
+        return new self($record, true);
     }
 
     /**
