@@ -83,6 +83,29 @@ abstract class base {
     }
 
     /**
+     * The comparison operators, in words.
+     *
+     * @return string[] By operator.
+     */
+    public static function operators(): array {
+        $operators = [];
+        foreach (['>=' => 'ge', '>' => 'gt', '<=' => 'le', '<' => 'lt', '=' => 'eq'] as $op => $name) {
+            $operators[$op] = get_string('op_' . $name, 'local_remindstudio');
+        }
+        return $operators;
+    }
+
+    /**
+     * A comparison operator setting, in words.
+     *
+     * @param array $config
+     * @return string
+     */
+    protected static function operator_text(array $config): string {
+        return self::operators()[self::operator_setting($config)];
+    }
+
+    /**
      * A comparison operator setting.
      *
      * @param array $config

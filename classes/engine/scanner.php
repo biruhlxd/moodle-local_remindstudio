@@ -18,6 +18,7 @@ namespace local_remindstudio\engine;
 
 use local_remindstudio\condition\sql_context;
 use local_remindstudio\condition\tree;
+use local_remindstudio\optout;
 use local_remindstudio\pace\calculator;
 use local_remindstudio\pace\course_settings;
 use local_remindstudio\rule;
@@ -231,6 +232,7 @@ final class scanner {
         [$rolesql, $roleparams] = $DB->get_in_or_equal($rule->get_roles(), SQL_PARAMS_NAMED, 'rsrole');
         $ctx = new sql_context($rule->courseid, $this->now);
         $conditions = tree::to_sql($rule->conditions, $ctx);
+        $optout = $rule->essential ? '' : 'AND NOT ' . optout::sql($ctx->param($rule->courseid), $ctx->param($this->now));
         $ids = $DB->get_fieldset_sql(
             "
             SELECT u.id
@@ -240,7 +242,7 @@ final class scanner {
              WHERE u.deleted = 0 AND u.suspended = 0
                    AND EXISTS (SELECT 1 FROM {role_assignments} ra
                                 WHERE ra.userid = u.id AND ra.contextid = :rscontext AND ra.roleid $rolesql)
-                   AND $conditions",
+                   AND $conditions $optout",
             $params + $roleparams + $ctx->params + ['rspacecourse' => $rule->courseid, 'rscontext' => $context->id]
         );
         return $ids ? array_combine($ids, array_map('intval', $ids)) : [];

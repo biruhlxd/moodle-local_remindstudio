@@ -46,7 +46,7 @@ class enrolled_days extends base {
         return get_string(
             'describe_enrolleddays',
             'local_remindstudio',
-            ['op' => self::operator_setting($config), 'days' => self::int_setting($config, 'days')]
+            ['op' => self::operator_text($config), 'days' => self::int_setting($config, 'days')]
         );
     }
 }

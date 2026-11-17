@@ -16,6 +16,7 @@
 
 namespace local_remindstudio\action;
 
+use local_remindstudio\optout;
 use local_remindstudio\placeholders;
 use stdClass;
 
@@ -61,15 +62,27 @@ final class reminder {
      * @param stdClass $course
      * @param stdClass|null $pace The learner's row in local_remindstudio_pace, if any.
      * @param int $now
+     * @param bool $optoutlink Add the link to snooze or stop the course's reminders (for rules that aren't essential).
      * @return self
      */
-    public static function create(stdClass $step, stdClass $user, stdClass $course, ?stdClass $pace, int $now): self {
+    public static function create(
+        stdClass $step,
+        stdClass $user,
+        stdClass $course,
+        ?stdClass $pace,
+        int $now,
+        bool $optoutlink = true
+    ): self {
         $previous = force_current_language($user->lang);
         try {
             $context = \context_course::instance($course->id);
             $subject = placeholders::replace($step->subject, placeholders::values($user, $course, $pace, false, $now));
             $body = placeholders::replace((string) $step->body, placeholders::values($user, $course, $pace, true, $now));
             $html = format_text($body, $step->bodyformat, ['context' => $context]);
+            if ($optoutlink) {
+                $link = \html_writer::link(optout::url($user->id, $course->id), get_string('optoutlink', 'local_remindstudio'));
+                $html .= \html_writer::tag('p', \html_writer::tag('small', $link));
+            }
             return new self($user, $course, $step, $subject, $html, html_to_text($html));
         } finally {
             force_current_language($previous);

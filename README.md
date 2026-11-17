@@ -14,8 +14,9 @@ Automatic reminders and nudges for learners, built around each learner's own dea
 
 Other plugins can add conditions and actions through the `\local_remindstudio\hook\collect_types` hook.
 
-**Status:** 0.1.0 (alpha), the rules engine. Course screens (rule editor, recipes, forecast, learner timeline,
-opt-out) come in the next release.
+**Status:** 0.2.0 (alpha). In each course, *More > Reminders* has tabs for the rules (from 7 recipes or blank), the
+reminders coming in the next 14 days, each learner's pace and timeline (with extensions), the log, and pacing.
+Learners can snooze or stop a course's reminders from a link in each one. Rules go with course backup and restore.
 
 Requires Moodle 4.5 or later.
 

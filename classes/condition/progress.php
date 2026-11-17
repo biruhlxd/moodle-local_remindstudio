@@ -45,7 +45,7 @@ class progress extends base {
         return get_string(
             'describe_progress',
             'local_remindstudio',
-            ['op' => self::operator_setting($config), 'value' => self::int_setting($config, 'value')]
+            ['op' => self::operator_text($config), 'value' => self::int_setting($config, 'value')]
         );
     }
 }
