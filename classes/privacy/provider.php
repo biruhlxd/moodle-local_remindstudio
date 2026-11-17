@@ -41,6 +41,7 @@ class provider implements
         'local_remindstudio_override',
         'local_remindstudio_track',
         'local_remindstudio_log',
+        'local_remindstudio_optout',
     ];
 
     #[\Override]
@@ -67,6 +68,10 @@ class provider implements
             'status' => 'privacy:metadata:log:status',
             'timesent' => 'privacy:metadata:log:timesent',
         ], 'privacy:metadata:log');
+        $collection->add_database_table('local_remindstudio_optout', [
+            'userid' => 'privacy:metadata:optout:userid',
+            'timeuntil' => 'privacy:metadata:optout:timeuntil',
+        ], 'privacy:metadata:optout');
         $collection->add_subsystem_link('core_message', [], 'privacy:metadata:core_message');
         return $collection;
     }
@@ -117,6 +122,9 @@ class provider implements
                     'expectedprogress' => $pace->expectedpct,
                 ];
             }
+            if ($optout = $DB->get_record('local_remindstudio_optout', $where)) {
+                $data->remindersoff = $optout->timeuntil ? transform::datetime($optout->timeuntil) : true;
+            }
             if ($override = $DB->get_record('local_remindstudio_override', $where)) {
                 $data->extension = (object) [
                     'expectedfinish' => transform::datetime($override->expectedend),
@@ -127,7 +135,7 @@ class provider implements
                 SELECT l.id, r.name AS rule, s.subject, l.status, l.timecreated, l.timesent
                   FROM {local_remindstudio_log} l
                   JOIN {local_remindstudio_rule} r ON r.id = l.ruleid
-                  JOIN {local_remindstudio_step} s ON s.id = l.stepid
+             LEFT JOIN {local_remindstudio_step} s ON s.id = l.stepid
                  WHERE l.courseid = :courseid AND l.userid = :userid
               ORDER BY l.id', $where);
             foreach ($reminders as $reminder) {
@@ -144,7 +152,7 @@ class provider implements
                   JOIN {local_remindstudio_rule} r ON r.id = t.ruleid
                  WHERE t.courseid = :courseid AND t.userid = :userid
               ORDER BY t.id', $where));
-            if (isset($data->pace) || isset($data->extension) || isset($data->reminders) || $data->rules) {
+            if ((array) $data !== ['rules' => []]) {
                 writer::with_context($context)->export_data([get_string('pluginname', 'local_remindstudio')], $data);
             }
         }

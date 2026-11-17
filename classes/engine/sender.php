@@ -71,7 +71,8 @@ final class sender {
         }
         try {
             $pace = $DB->get_record('local_remindstudio_pace', ['courseid' => $course->id, 'userid' => $user->id]) ?: null;
-            $reminder = reminder::create($step, $user, $course, $pace, time());
+            $essential = (bool) $DB->get_field('local_remindstudio_rule', 'essential', ['id' => $log->ruleid]);
+            $reminder = reminder::create($step, $user, $course, $pace, time(), !$essential);
             foreach (json_decode($step->actions, true) ?: [] as $type) {
                 registry::action($type)->execute($reminder);
             }
