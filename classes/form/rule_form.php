@@ -168,13 +168,14 @@ class rule_form extends \moodleform {
             $mform->createElement('duration', 'sdelay', $str('stepdelay'), ['defaultunit' => DAYSECS]),
             $mform->createElement('text', 'ssubject', $str('stepsubject'), ['size' => 60]),
             $mform->createElement('editor', 'sbody', $str('stepbody'), ['rows' => 6]),
-            $mform->createElement('advcheckbox', 'slearner', '', $str('action_messagelearner')),
-            $mform->createElement('advcheckbox', 'steachers', '', $str('action_copyteachers')),
         ];
+        foreach (registry::actions() as $type => $action) {
+            $elements[] = $mform->createElement('advcheckbox', 'saction_' . $type, '', $action->get_name());
+        }
         $options = [
             'sdelay' => ['default' => 0],
             'ssubject' => ['type' => PARAM_TEXT],
-            'slearner' => ['default' => 1],
+            'saction_messagelearner' => ['default' => 1],
         ];
         $this->repeat_elements(
             $elements,
@@ -210,7 +211,7 @@ class rule_form extends \moodleform {
             if ($unknown) {
                 $errors["ssubject[$i]"] = get_string('error_unknownplaceholder', 'local_remindstudio', implode(', ', $unknown));
             }
-            if (empty($data['slearner'][$i]) && empty($data['steachers'][$i])) {
+            if (!self::step_actions($data, $i)) {
                 $errors["ssubject[$i]"] = get_string('error_noaction', 'local_remindstudio');
             }
         }
@@ -243,19 +244,12 @@ class rule_form extends \moodleform {
             if (trim($subject) === '') {
                 continue;
             }
-            $actions = [];
-            if (!empty($data['slearner'][$i])) {
-                $actions[] = 'messagelearner';
-            }
-            if (!empty($data['steachers'][$i])) {
-                $actions[] = 'copyteachers';
-            }
             $steps[] = [
                 'delay' => (int) $data['sdelay'][$i],
                 'subject' => trim($subject),
                 'body' => $data['sbody'][$i]['text'],
                 'bodyformat' => (int) $data['sbody'][$i]['format'],
-                'actions' => $actions,
+                'actions' => self::step_actions($data, $i),
             ];
         }
         return [[
@@ -308,10 +302,28 @@ class rule_form extends \moodleform {
             $form['ssubject'][$i] = $step['subject'];
             $form['sbody'][$i] = ['text' => $step['body'] ?? '', 'format' => $step['bodyformat'] ?? FORMAT_HTML];
             $actions = $step['actions'] ?? ['messagelearner'];
-            $form['slearner'][$i] = (int) in_array('messagelearner', $actions);
-            $form['steachers'][$i] = (int) in_array('copyteachers', $actions);
+            foreach (array_keys(registry::actions()) as $type) {
+                $form['saction_' . $type][$i] = (int) in_array($type, $actions);
+            }
         }
         return $form;
+    }
+
+    /**
+     * The actions ticked in a step.
+     *
+     * @param array $data Submitted values.
+     * @param int $i Step row.
+     * @return string[]
+     */
+    private static function step_actions(array $data, int $i): array {
+        $actions = [];
+        foreach (array_keys(registry::actions()) as $type) {
+            if (!empty($data['saction_' . $type][$i])) {
+                $actions[] = $type;
+            }
+        }
+        return $actions;
     }
 
     /**

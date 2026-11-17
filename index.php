@@ -110,10 +110,9 @@ if ($canmanage) {
     echo html_writer::end_div();
 }
 
+$inherited = rule::get_inherited($courseid)->get_rules();
 if (!$rules) {
     echo $OUTPUT->notification(get_string('norules', 'local_remindstudio'), 'info', false);
-    echo $OUTPUT->footer();
-    exit;
 }
 
 $table = new html_table();
@@ -165,5 +164,40 @@ foreach ($rules as $rule) {
     }
     $table->data[] = $row;
 }
-echo html_writer::table($table);
+if ($rules) {
+    echo html_writer::table($table);
+}
+
+if ($inherited) {
+    echo $OUTPUT->heading(get_string('siterules', 'local_remindstudio'), 3);
+    $table = new html_table();
+    $table->head = [
+        get_string('rulename', 'local_remindstudio'),
+        get_string('rulewhowhen', 'local_remindstudio'),
+        get_string('matchingnow', 'local_remindstudio'),
+        get_string('sentweek', 'local_remindstudio'),
+        get_string('actions'),
+    ];
+    foreach ($inherited as $entry) {
+        $rule = $entry->rule;
+        $name = format_string($rule->name);
+        if (!$entry->active) {
+            $name .= ' ' . html_writer::span(get_string('offhere', 'local_remindstudio'), 'badge bg-secondary');
+        }
+        if ($entry->locked) {
+            $name .= ' ' . html_writer::span(get_string('locked', 'local_remindstudio'), 'badge bg-light text-dark');
+        }
+        $table->data[] = [
+            $name,
+            s(summary::rule($rule->triggertype, $rule->conditions))
+                . html_writer::div(s(summary::steps($rule->get_steps())), 'small text-muted'),
+            $entry->active ? count($scanner->matching_users($rule)) : '-',
+            $sent[$rule->id] ?? 0,
+            $canmanage && $entry->manageurl && !$entry->locked
+                ? html_writer::link($entry->manageurl, get_string($entry->active ? 'turnoff' : 'turnon', 'local_remindstudio'))
+                : '',
+        ];
+    }
+    echo html_writer::table($table);
+}
 echo $OUTPUT->footer();
