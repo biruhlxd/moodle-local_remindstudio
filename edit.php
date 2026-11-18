@@ -61,7 +61,7 @@ foreach (get_fast_modinfo($course)->get_cms() as $cm) {
     }
 }
 $formconditions = rule_form::form_conditions($data['conditions']);
-$form = new rule_form(null, [
+$form = new rule_form($PAGE->url, [
     'activities' => $activities,
     'roles' => get_viewable_roles($context),
     'conditioncount' => max(1, count($formconditions)),

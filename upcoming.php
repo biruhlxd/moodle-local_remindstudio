@@ -59,7 +59,7 @@ echo $OUTPUT->single_select(
     $days,
     null,
     null,
-    ['label' => get_string('show'), 'labelattributes' => ['class' => 'me-2']]
+    ['label' => get_string('show')]
 );
 echo html_writer::tag('p', get_string('upcoming_help', 'local_remindstudio'), ['class' => 'text-muted small mt-2']);
 

@@ -189,6 +189,26 @@ class rule_form extends \moodleform {
         );
     }
 
+    /**
+     * Load the form, giving each repeated field its value under its own name ("sdelay[1]"): the defaults of
+     * repeat_elements() are stored under those names and would otherwise win over values given as arrays.
+     *
+     * @param array|\stdClass $defaultvalues From to_formdata().
+     */
+    #[\Override]
+    public function set_data($defaultvalues) {
+        $values = (array) $defaultvalues;
+        foreach ($values as $key => $value) {
+            if (is_array($value) && preg_match('/^(ctype|c_\w+|sdelay|ssubject|sbody|saction_\w+)$/', $key)) {
+                unset($values[$key]);
+                foreach ($value as $i => $item) {
+                    $values["{$key}[$i]"] = $item;
+                }
+            }
+        }
+        parent::set_data($values);
+    }
+
     #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
