@@ -15,3 +15,9 @@ backup and restore of rules and pacing.
 
 Hooks for other plugins to apply site rules to courses and add courses to the scan; site rules shown on the course
 Rules tab; step actions in the editor come from the registry, so actions from other plugins can be chosen.
+
+## 0.3.1 (2026-11-18)
+
+Fixes found in the browser: the rule editor now saves (it posted without the course), shows the saved step
+delays, actions and condition settings (they showed defaults), and the Rules and Upcoming pages no longer fail on
+their dropdown menus.

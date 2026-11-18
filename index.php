@@ -92,15 +92,15 @@ if ($settings->paused) {
 }
 if ($canmanage) {
     echo html_writer::start_div('d-flex flex-wrap align-items-center mb-3');
-    echo $OUTPUT->single_select(
+    $select = new single_select(
         new moodle_url('/local/remindstudio/edit.php', ['id' => $courseid]),
         'recipe',
         ['blank' => get_string('blankrule', 'local_remindstudio')] + recipes::names(),
         '',
-        ['' => get_string('addrule', 'local_remindstudio')],
-        null,
-        ['label' => get_string('addrule', 'local_remindstudio'), 'labelattributes' => ['class' => 'sr-only']]
+        ['' => get_string('addrule', 'local_remindstudio')]
     );
+    $select->set_label(get_string('addrule', 'local_remindstudio'), ['class' => 'sr-only']);
+    echo $OUTPUT->render($select);
     $pause = $settings->paused ? 'resume' : 'pause';
     echo html_writer::div($OUTPUT->single_button(
         new moodle_url($url, ['action' => $pause, 'sesskey' => sesskey()]),
