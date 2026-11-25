@@ -36,7 +36,8 @@ $course = page::setup('log', $courseid, 'viewcourse', ['page' => $pageno]);
 $namefields = 'u.' . implode(', u.', fields::get_name_fields());
 $total = $DB->count_records('local_remindstudio_log', ['courseid' => $courseid]);
 $logs = $DB->get_records_sql("
-    SELECT l.id, l.userid, l.status, l.reason, l.timecreated, l.timesent, r.name, s.subject, s.sortorder, $namefields
+    SELECT l.id, l.userid, l.status, l.reason, l.timecreated, l.timesent, r.name,
+           COALESCE(l.subject, s.subject) AS subject, s.sortorder, $namefields
       FROM {local_remindstudio_log} l
       JOIN {local_remindstudio_rule} r ON r.id = l.ruleid
       JOIN {user} u ON u.id = l.userid

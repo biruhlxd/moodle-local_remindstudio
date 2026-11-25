@@ -161,6 +161,7 @@ $string['priority_help'] = 'When the daily limit allows only some reminders, the
 $string['privacy:metadata:core_message'] = 'Reminders are sent as Moodle notifications.';
 $string['privacy:metadata:log'] = 'The reminders sent to each learner.';
 $string['privacy:metadata:log:status'] = 'Whether the reminder was sent.';
+$string['privacy:metadata:log:subject'] = 'The subject of the reminder as sent.';
 $string['privacy:metadata:log:timesent'] = 'When the reminder was sent.';
 $string['privacy:metadata:log:userid'] = 'The learner.';
 $string['privacy:metadata:optout'] = 'Learners who snoozed or stopped a course\'s reminders.';
