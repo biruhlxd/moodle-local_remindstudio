@@ -59,4 +59,4 @@ the Privacy API for export and deletion. Nothing is sent outside the site.
 
 ## Licence
 
-GNU GPL v3 or later. © 2026 Biruh Alemnew, [edtechtools.shop](https://edtechtools.shop)
+GNU GPL v3 or later. © 2026 Biruh Alemnew
