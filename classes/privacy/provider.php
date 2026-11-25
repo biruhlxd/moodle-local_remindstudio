@@ -66,6 +66,7 @@ class provider implements
         $collection->add_database_table('local_remindstudio_log', [
             'userid' => 'privacy:metadata:log:userid',
             'status' => 'privacy:metadata:log:status',
+            'subject' => 'privacy:metadata:log:subject',
             'timesent' => 'privacy:metadata:log:timesent',
         ], 'privacy:metadata:log');
         $collection->add_database_table('local_remindstudio_optout', [
@@ -132,7 +133,7 @@ class provider implements
                 ];
             }
             $reminders = $DB->get_records_sql('
-                SELECT l.id, r.name AS rule, s.subject, l.status, l.timecreated, l.timesent
+                SELECT l.id, r.name AS rule, COALESCE(l.subject, s.subject) AS subject, l.status, l.timecreated, l.timesent
                   FROM {local_remindstudio_log} l
                   JOIN {local_remindstudio_rule} r ON r.id = l.ruleid
              LEFT JOIN {local_remindstudio_step} s ON s.id = l.stepid

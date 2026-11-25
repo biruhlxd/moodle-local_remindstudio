@@ -80,7 +80,7 @@ final class sender {
             $this->finish($log, 'failed', $e->getMessage());
             return;
         }
-        $this->finish($log, 'sent');
+        $this->finish($log, 'sent', null, \core_text::substr($reminder->subject, 0, 255));
         reminder_sent::create([
             'objectid' => $log->id,
             'context' => \context_course::instance($course->id),
@@ -95,12 +95,13 @@ final class sender {
      * @param stdClass $log
      * @param string $status sent or failed.
      * @param string|null $reason
+     * @param string|null $subject The subject as sent.
      */
-    private function finish(stdClass $log, string $status, ?string $reason = null): void {
+    private function finish(stdClass $log, string $status, ?string $reason = null, ?string $subject = null): void {
         global $DB;
         $DB->update_record(
             'local_remindstudio_log',
-            ['id' => $log->id, 'status' => $status, 'reason' => $reason, 'timesent' => time()]
+            ['id' => $log->id, 'status' => $status, 'reason' => $reason, 'subject' => $subject, 'timesent' => time()]
         );
     }
 }

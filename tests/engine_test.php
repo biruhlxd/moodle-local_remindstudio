@@ -112,6 +112,7 @@ final class engine_test extends \advanced_testcase {
         $this->assertSame('Hi ' . $user->firstname, $messages[0]->subject);
         $this->assertStringContainsString('/course/view.php?id=' . $course->id, $messages[0]->fullmessagehtml);
         $this->assertSame('sent', $DB->get_field('local_remindstudio_log', 'status', ['id' => $logids[0]]));
+        $this->assertSame('Hi ' . $user->firstname, $DB->get_field('local_remindstudio_log', 'subject', ['id' => $logids[0]]));
 
         $this->assertCount(1, (new scanner(self::NOW + 3 * DAYSECS))->scan_course($course->id));
         $this->assertSame('done', $DB->get_field('local_remindstudio_track', 'status', ['ruleid' => $rule->id]));
@@ -268,7 +269,7 @@ final class engine_test extends \advanced_testcase {
         $approved = new approved_contextlist($user, 'local_remindstudio', [$context->id]);
         privacy\provider::export_user_data($approved);
         $data = writer::with_context($context)->get_data([get_string('pluginname', 'local_remindstudio')]);
-        $this->assertSame('Hi {firstname}', $data->reminders[0]->subject);
+        $this->assertSame('Hi ' . $user->firstname, $data->reminders[0]->subject);
 
         privacy\provider::delete_data_for_user($approved);
         foreach (['local_remindstudio_pace', 'local_remindstudio_track', 'local_remindstudio_log'] as $table) {

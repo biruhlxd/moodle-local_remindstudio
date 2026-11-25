@@ -113,7 +113,7 @@ if (!$tracks) {
 
 echo $OUTPUT->heading(get_string('learnerreminders', 'local_remindstudio'), 4);
 $logs = $DB->get_records_sql('
-    SELECT l.*, r.name, s.subject, s.sortorder
+    SELECT l.*, r.name, COALESCE(l.subject, s.subject) AS subject, s.sortorder
       FROM {local_remindstudio_log} l
       JOIN {local_remindstudio_rule} r ON r.id = l.ruleid
  LEFT JOIN {local_remindstudio_step} s ON s.id = l.stepid

@@ -25,4 +25,5 @@ their dropdown menus.
 ## 1.0.0 (2026-11-25)
 
 First stable release. Tested on Moodle 4.5 and 5.3. Behat tests for managing rules, pausing a course and the
-opt-out link; README with requirements, use, capabilities and privacy.
+opt-out link; README with requirements, use, capabilities and privacy. The log keeps the subject of each reminder
+as sent (placeholders filled in), shown in the Log, the learner timeline and the privacy export.

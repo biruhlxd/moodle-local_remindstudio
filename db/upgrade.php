@@ -49,5 +49,14 @@ function xmldb_local_remindstudio_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026111701, 'local', 'remindstudio');
     }
 
+    if ($oldversion < 2026112501) {
+        $table = new xmldb_table('local_remindstudio_log');
+        $field = new xmldb_field('subject', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'reason');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026112501, 'local', 'remindstudio');
+    }
+
     return true;
 }
