@@ -21,3 +21,8 @@ Rules tab; step actions in the editor come from the registry, so actions from ot
 Fixes found in the browser: the rule editor now saves (it posted without the course), shows the saved step
 delays, actions and condition settings (they showed defaults), and the Rules and Upcoming pages no longer fail on
 their dropdown menus.
+
+## 1.0.0 (2026-11-25)
+
+First stable release. Tested on Moodle 4.5 and 5.3. Behat tests for managing rules, pausing a course and the
+opt-out link; README with requirements, use, capabilities and privacy.

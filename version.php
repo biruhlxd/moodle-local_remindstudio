@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_remindstudio';
-$plugin->version   = 2026111703;
+$plugin->version   = 2026112500;
 $plugin->requires  = 2024100700; // Moodle 4.5.
 $plugin->supported = [405, 503];
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '0.3.1';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = '1.0.0';
